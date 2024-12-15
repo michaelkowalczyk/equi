@@ -1,8 +1,27 @@
-// Load lens data (replace with the actual path to your JSON or CSV file)
+// Lens data from CSV (you'll later load this dynamically)
 const lensData = [
-    { fullFrame: "Nikon 50mm f/1.8", apsc: "Fujifilm 35mm f/1.4", cropFactor: 1.5 },
-    { fullFrame: "Nikon 24mm f/2.8", apsc: "Fujifilm 16mm f/2.0", cropFactor: 1.5 },
-    // Add more entries from your data
+    {
+      mount: "Fujifilm X",
+      cropFactor: 1.5,
+      focalLength: 16,
+      fullFrameFocal: 24,
+      aperture: 1.4,
+      fullFrameAperture: 2.1,
+      weight: 375,
+      length: 73,
+      weatherSealing: "Yes"
+    },
+    {
+      mount: "Nikon Z",
+      cropFactor: 1,
+      focalLength: 24,
+      fullFrameFocal: 24,
+      aperture: 1.8,
+      fullFrameAperture: 1.8,
+      weight: 450,
+      length: 97,
+      weatherSealing: "Yes"
+    }
   ];
   
   // Populate the dropdown menu with full-frame lenses
@@ -10,24 +29,65 @@ const lensData = [
   lensData.forEach((lens, index) => {
     const option = document.createElement("option");
     option.value = index;
-    option.textContent = lens.fullFrame;
+    option.textContent = `${lens.mount} - ${lens.focalLength}mm f/${lens.aperture}`;
     lensSelect.appendChild(option);
   });
   
-  // Event listener for finding equivalent
-  document.getElementById("findEquivalent").addEventListener("click", () => {
+  // Event listener for comparison
+  document.getElementById("compareLens").addEventListener("click", () => {
     const selectedIndex = lensSelect.value;
     if (selectedIndex === "") {
       alert("Please select a lens.");
       return;
     }
+    
     const selectedLens = lensData[selectedIndex];
-    const { apsc, cropFactor } = selectedLens;
+    const cropFactor = selectedLens.cropFactor;
   
-    // Display the result
-    document.getElementById("result").innerHTML = `
-      <p><strong>APS-C Equivalent:</strong> ${apsc}</p>
-      <p><strong>Crop Factor:</strong> ${cropFactor}x</p>
+    // Calculate the APS-C equivalent
+    const apscFocalLength = (selectedLens.focalLength / cropFactor).toFixed(1);
+    const apscAperture = (selectedLens.aperture * cropFactor).toFixed(1);
+  
+    // Build the comparison table
+    const comparisonTable = `
+      <table>
+        <tr>
+          <th>Property</th>
+          <th>Full Frame</th>
+          <th>APS-C Equivalent</th>
+        </tr>
+        <tr>
+          <td>Focal Length</td>
+          <td>${selectedLens.focalLength}mm</td>
+          <td class="${apscFocalLength != selectedLens.fullFrameFocal ? 'highlight-difference' : 'highlight-match'}">
+            ${apscFocalLength}mm
+          </td>
+        </tr>
+        <tr>
+          <td>Aperture</td>
+          <td>f/${selectedLens.aperture}</td>
+          <td class="${apscAperture != selectedLens.fullFrameAperture ? 'highlight-difference' : 'highlight-match'}">
+            f/${apscAperture}
+          </td>
+        </tr>
+        <tr>
+          <td>Weight</td>
+          <td>${selectedLens.weight}g</td>
+          <td>${selectedLens.weight}g</td>
+        </tr>
+        <tr>
+          <td>Length</td>
+          <td>${selectedLens.length}mm</td>
+          <td>${selectedLens.length}mm</td>
+        </tr>
+        <tr>
+          <td>Weather Sealing</td>
+          <td>${selectedLens.weatherSealing}</td>
+          <td>${selectedLens.weatherSealing}</td>
+        </tr>
+      </table>
     `;
+  
+    document.getElementById("comparisonTable").innerHTML = comparisonTable;
   });
   
