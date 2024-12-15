@@ -1,3 +1,30 @@
+// PapaParse loading script
+document.getElementById("loadCSV").addEventListener("click", () => {
+    Papa.parse("lens_data.csv", {
+      download: true, // This tells PapaParse to fetch the file from the server
+      header: true,   // This treats the first row as headers
+      complete: function(results) {
+        const lensData = results.data;
+        console.log(lensData); // Check if the data loads correctly in the console
+        populateDropdown(lensData); // Pass data to populate the dropdown
+      },
+      error: function(error) {
+        console.error("Error parsing the CSV file:", error);
+      }
+    });
+  });
+  
+  // Function to populate dropdown
+  function populateDropdown(lensData) {
+    const lensSelect = document.getElementById("lensSelect");
+    lensData.forEach((lens, index) => {
+      const option = document.createElement("option");
+      option.value = index;
+      option.textContent = `${lens["Lens Mount"]} - ${lens["Lens Focal length in mm"]}mm f/${lens["Aperture in f-stop"]}`;
+      lensSelect.appendChild(option);
+    });
+  }
+
 // Lens data from CSV (you'll later load this dynamically)
 const lensData = [
     {
